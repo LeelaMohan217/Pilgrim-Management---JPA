@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+body {
+	font-family: Arial, sans-serif;
+	background-color: #e8f2f2 !important;
+}
+
+.search-btn, .reset-btn, .add-btn, .submit-btn, .cancel-btn {
+	background-color: transparent !important;
+	color: #004953 !important;
+	font-weight: bold;
+	border: 2px solid #004953 !important;
+	padding: 2px 20px;
+	border-radius: 4px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.search-btn:hover, .reset-btn:hover, .add-btn:hover, .submit-btn:hover,
+	.cancel-btn:hover {
+	background-color: #e8f2f2 !important;
+}
+
+.dialogButtons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 20px;
+	margin-top: 20px;
+}
+</style>
+
+</h:head>
+<h:body>
+
+	<center>
+		<h1>
+			<p:outputLabel value="City Data"
+				style="font-size: 36px; font-weight: bold;" />
+		</h1>
+	</center>
+
+	<hr />
+
+	<h:form>
+		<p:menubar>
+			<p:menuitem value="Home" outcome="home" icon="pi pi-home" />
+			<p:menuitem value="Piligrim Info" outcome="piligrim"
+				icon="pi pi-info-circle" />
+			<p:menuitem value="Place" outcome="place" icon="pi pi-map-marker" />
+			<p:menuitem value="Country" outcome="country1" icon="pi pi-globe"
+				action="#{countryBean.countries}" update="countryDataTableForm" process="@this"/>
+			<p:menuitem value="State" outcome="state1" icon="pi pi-map"
+				action="#{stateBean.states}" update="stateDataTableForm" process="@this"/>
+			<p:menuitem value="City" outcome="city1" icon="pi pi-building"
+				action="#{cityBean.cities}" update="cityDataTableForm" process="@this"/>
+		</p:menubar>
+	</h:form>
+
+	<h:form id="ct_srch_btn_frm">
+		<p:panelGrid layout="grid" id="ct_search" columns="1"
+			style="width:100%;">
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<h2>
+							<p:outputLabel id="lbl_ct_search" value="City Name"
+								for="searchId" />
+						</h2>
+					</p:column>
+					<p:column>
+						<p:inputText id="searchId" value="#{cityBean.searchCityName}"
+							required="true" requiredMessage="Enter City Name"
+							placeholder="Enter City Name"
+							style="border:2px solid #004953; padding: 10px 20px;" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="searchButton" value="Search"
+							styleClass="search-btn" action="#{cityBean.searchCitiesByName}"
+							update=":cityDataTableForm ct_srch_btn_frm" process="@form" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="resetButton" value="Reset"
+							styleClass="reset-btn" action="#{cityBean.resetSearch}"
+							update=":cityDataTableForm ct_srch_btn_frm" process="@form" />
+					</p:column>
+					<p:column>
+						<p:commandButton value="Add City"
+							onclick="PF('formDialogCity').show()" styleClass="add-btn" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panelGrid>
+	</h:form>
+
+	<h:form id="cityDataTableForm">
+		<p:dataTable id="cityTable" value="#{cityBean.cities}" var="ct"
+			showGridlines="true" emptyMessage="City not found. Try again!"
+			style="text-align: center;" paginator="true" rows="5"
+			rowsPerPageOptions="5,10,20">
+
+			<p:column headerText="Id" style="text-align: center;">
+				<h:outputText value="#{ct.city_id}"></h:outputText>
+			</p:column>
+			<p:column headerText="Country Code" style="text-align: center;">
+				<h:outputText value="#{ct.state.country.country_code}"></h:outputText>
+			</p:column>
+			<p:column headerText="Country Name" style="text-align: center;">
+				<h:outputText value="#{ct.state.country.country_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="State Name" style="text-align: center;">
+				<h:outputText value="#{ct.state.state_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="City Name" style="text-align: center;">
+				<h:outputText value="#{ct.city_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="Edit" style="text-align: center;">
+				<p:commandButton icon="pi pi-pencil"
+					style="text-align: center; color: #004953; background: transparent; border: none;"
+					action="#{cityBean.loadCityForEdit(ct.city_id)}"
+					update=":city_upd_frm:upd_dialog_panel_grid" process="@this"
+					onclick="PF('formUpdateDialogCity').show()" />
+			</p:column>
+			<p:column headerText="Delete" style="text-align: center;">
+				<p:commandButton icon="pi pi-trash"
+					style="text-align: center; color: red; background: transparent; border: none;"
+					action="#{cityBean.deleteCity(ct.city_id)}"
+					update=":cityDataTableForm " process="@this" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+	<h:form id="city_add_frm">
+		<p:dialog id="frm_dialog" widgetVar="formDialogCity"
+			header="State Form" showEffect="fade" hideEffect="fade"
+			closeOnEscape="true" styleClass="dialogContainer" minHeight="40"
+			height="330px" width="500" resizable="true" responsive="true">
+
+			<p:panelGrid id="dialog_panel_grid" layout="grid" columns="2"
+				style="width: 100%;">
+
+				<p:outputLabel for="countryCode"
+					style="font-weight: bold; color: #203D3F;">Country Code</p:outputLabel>
+				<p:selectOneMenu id="countryCode"
+					value="#{cityBean.selectedCountryCode}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Country Code" itemValue=""
+						noSelectionOption="true" />
+					<f:selectItems value="#{cityBean.countries}" var="country"
+						itemLabel="#{country.country_code}"
+						itemValue="#{country.country_code}" />
+					<p:ajax listener="#{cityBean.loadStatesForCountry}"
+						update="countryName stateName" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="countryName"
+					style="font-weight: bold; color: #203D3F;">Country Name</p:outputLabel>
+				<p:inputText id="countryName"
+					value="#{cityBean.selectedCountryName}" required="true"
+					readonly="true" style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="stateName"
+					style="font-weight: bold; color: #203D3F;">State Name</p:outputLabel>
+				<p:selectOneMenu id="stateName" value="#{cityBean.selectedStateId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Your State" itemValue=""
+						noSelectionOption="true" />
+					<f:selectItems value="#{cityBean.states}" var="state"
+						itemLabel="#{state.state_name}" itemValue="#{state.state_id}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="cityName"
+					style="font-weight: bold; color: #203D3F;">City Name</p:outputLabel>
+				<p:inputText id="cityName" value="#{cityBean.newCity.city_name}"
+					required="true" styleClass="block"
+					placeholder="Enter Your City Name"
+					style="width:200px; border:2px solid #004953;">
+					<f:validateLength minimum="3" maximum="20" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+			<div class="dialogButtons">
+				<p:commandButton id="submit_btn" value="Submit"
+					styleClass="submit-btn" action="#{cityBean.saveCity}"
+					update=":cityDataTableForm city_add_frm" process="@form"
+					oncomplete="PF('formDialogCity').hide();" />
+				<p:commandButton id="cancel_btn" value="Cancel"
+					styleClass="cancel-btn" onclick="PF('formDialogCity').hide()" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+	<h:form id="city_upd_frm">
+		<p:dialog id="upd_frm_dialog" widgetVar="formUpdateDialogCity"
+			header="State Form" showEffect="fade" hideEffect="fade"
+			closeOnEscape="true" styleClass="dialogContainer" minHeight="40"
+			height="330px" width="500" resizable="true" responsive="true">
+
+			<p:panelGrid id="upd_dialog_panel_grid" layout="grid" columns="2"
+				style="width: 100%;">
+
+				<p:outputLabel for="countryCode"
+					style="font-weight: bold; color: #203D3F;">Country Code</p:outputLabel>
+				<p:selectOneMenu id="countryCode"
+					value="#{cityBean.selectedCountryCode}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Country Code" itemValue=""
+						noSelectionOption="true" />
+					<f:selectItems value="#{cityBean.countries}" var="country"
+						itemLabel="#{country.country_code}"
+						itemValue="#{country.country_code}" />
+					<p:ajax listener="#{cityBean.loadStatesForCountry}"
+						update="countryName stateName" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="countryName"
+					style="font-weight: bold; color: #203D3F;">Country Name</p:outputLabel>
+				<p:inputText id="countryName"
+					value="#{cityBean.selectedCountryName}" required="true"
+					readonly="true" style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="stateName"
+					style="font-weight: bold; color: #203D3F;">State Name</p:outputLabel>
+				<p:selectOneMenu id="stateName" value="#{cityBean.selectedStateId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Your State" itemValue=""
+						noSelectionOption="true" />
+					<f:selectItems value="#{cityBean.states}" var="state"
+						itemLabel="#{state.state_name}" itemValue="#{state.state_id}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="cityName"
+					style="font-weight: bold; color: #203D3F;">City Name</p:outputLabel>
+				<p:inputText id="cityName"
+					value="#{cityBean.selectedCity.city_name}" required="true"
+					styleClass="block" placeholder="Enter Your City Name"
+					style="width:200px; border:2px solid #004953;">
+					<f:validateLength minimum="3" maximum="20" />
+				</p:inputText>
+
+			</p:panelGrid>
+
+			<div class="dialogButtons">
+				<p:commandButton id="submit_btn" value="Submit"
+					styleClass="submit-btn" action="#{cityBean.updateCity}"
+					update=":cityDataTableForm, upd_dialog_panel_grid" process="@form"
+					oncomplete="PF('formUpdateDialogCity').hide();" />
+				<p:commandButton id="cancel_btn" value="Cancel"
+					styleClass="cancel-btn" onclick="PF('formUpdateDialogCity').hide()" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>

@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+body {
+	font-family: Arial, sans-serif;
+	background-color: #e8f2f2 !important;
+}
+
+.search-btn, .reset-btn, .add-btn, .submit-btn, .cancel-btn {
+	background-color: transparent !important;
+	color: #004953 !important;
+	font-weight: bold;
+	border: 2px solid #004953 !important;
+	padding: 2px 20px;
+	border-radius: 4px;
+	font-size: 16px;
+	cursor: pointer;
+	transition: background-color 0.3s;
+}
+
+.search-btn:hover, .reset-btn:hover, .add-btn:hover, .submit-btn:hover,
+	.cancel-btn:hover {
+	background-color: #e8f2f2 !important;
+}
+
+.dialogButtons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 20px;
+	margin-top: 20px;
+}
+</style>
+
+</h:head>
+<h:body>
+
+	<center>
+		<h1>
+			<p:outputLabel value="Piligrim Data"
+				style="font-size: 36px; font-weight: bold;" />
+		</h1>
+	</center>
+
+	<hr />
+
+	<h:form>
+		<p:menubar>
+			<p:menuitem value="Home" outcome="home" icon="pi pi-home" />
+			<p:menuitem value="Piligrim Info" outcome="piligrim"
+				icon="pi pi-info-circle" />
+			<p:menuitem value="Place" outcome="place" icon="pi pi-map-marker" />
+			<p:menuitem value="Country" outcome="country1" icon="pi pi-globe" />
+			<p:menuitem value="State" outcome="state1" icon="pi pi-map" />
+			<p:menuitem value="City" outcome="city1" icon="pi pi-building" />
+		</p:menubar>
+	</h:form>
+
+	<h:form id="plg_srch_btn_frm">
+		<p:panelGrid layout="grid" id="plg_search" columns="1"
+			style="width:100%;">
+			<p:panelGrid>
+				<p:row>
+					<p:column>
+						<h2>
+							<p:outputLabel id="lbl_plg_search" value="Piligrim Name"
+								for="searchId" />
+						</h2>
+					</p:column>
+					<p:column>
+						<p:inputText id="searchId"
+							value="#{pilgrimBean.searchPilgrimName}" required="true"
+							requiredMessage="Enter Piligrim Name"
+							placeholder="Enter Piligrim Name"
+							style="border:2px solid #004953; padding: 10px 20px;" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="searchButton" value="Search"
+							styleClass="search-btn" action="#{pilgrimBean.searchPilgrim}"
+							update=":PiligrimDataTableForm" process="@form" />
+					</p:column>
+					<p:column>
+						<p:commandButton id="resetButton" value="Reset"
+							styleClass="reset-btn" action="#{pilgrimBean.resetSearch}"
+							update=":PiligrimDataTableForm plg_srch_btn_frm" process="@form" />
+					</p:column>
+					<p:column>
+						<p:commandButton value="Add Piligrim"
+							onclick="PF('formDialogPiligrim').show()" styleClass="add-btn" />
+					</p:column>
+				</p:row>
+			</p:panelGrid>
+		</p:panelGrid>
+	</h:form>
+
+	<h:form id="PiligrimDataTableForm">
+		<p:dataTable id="piligrimTable" value="#{pilgrimBean.pilgrims}"
+			var="plg" showGridlines="true"
+			emptyMessage="Piligrim not found. Try again!"
+			style="text-align: center;" paginator="true" rows="5"
+			rowsPerPageOptions="5,10,20">
+
+			<p:column headerText="Id" style="text-align: center;">
+				<h:outputText value="#{plg.id}"></h:outputText>
+			</p:column>
+			<p:column headerText="Name" style="text-align: center;">
+				<h:outputText value="#{plg.name}"></h:outputText>
+			</p:column>
+			<p:column headerText="Gender" style="text-align: center;">
+				<h:outputText value="#{plg.gender}"></h:outputText>
+			</p:column>
+			<p:column headerText="Age" style="text-align: center;">
+				<h:outputText value="#{plg.age}"></h:outputText>
+			</p:column>
+			<p:column headerText="Aadhar" style="text-align: center;">
+				<h:outputText value="#{plg.aadhar}"></h:outputText>
+			</p:column>
+			<p:column headerText="Darshan" style="text-align: center;">
+				<h:outputText value="#{plg.darshan}"></h:outputText>
+			</p:column>
+			<p:column headerText="Accomodation" style="text-align: center;">
+				<h:outputText value="#{plg.place.place_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="Mobile" style="text-align: center;">
+				<h:outputText value="#{plg.mobile}"></h:outputText>
+			</p:column>
+			<p:column headerText="Country" style="text-align: center;">
+				<h:outputText value="#{plg.country.country_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="State" style="text-align: center;">
+				<h:outputText value="#{plg.state.state_name}"></h:outputText>
+			</p:column>
+			<p:column headerText="City" style="text-align: center;">
+				<h:outputText value="#{plg.city.city_name}"></h:outputText>
+			</p:column>
+
+			<p:column headerText="Edit" style="text-align: center;">
+				<p:commandButton icon="pi pi-pencil"
+					style="text-align: center; color: #004953; background: transparent; border: none;"
+					onclick="PF('updateFormDialogPiligrim').show()"
+					action="#{pilgrimBean.loadPilgrimForEdit(plg.id)}"
+					update=":piligrim_upd_frm:upd_dialog_panel_grid" process="@this" />
+			</p:column>
+
+			<p:column headerText="Delete" style="text-align: center;">
+				<p:commandButton icon="pi pi-trash"
+					action="#{pilgrimBean.deletePilgrim(plg.id)}"
+					update=":PiligrimDataTableForm" process="@this"
+					style="text-align: center; color: red; background: transparent; border: none;" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+
+	<h:form id="piligrim_add_frm">
+		<p:dialog id="frm_dialog" widgetVar="formDialogPiligrim"
+			header="Piligrim Form" showEffect="fade" hideEffect="fade"
+			closeOnEscape="true" styleClass="dialogContainer" minHeight="40"
+			height="500px" width="950" resizable="true" responsive="true">
+
+			<p:panelGrid id="dialog_panel_grid" layout="grid" columns="4"
+				style="width: 100%;">
+				<p:outputLabel for="name" style="font-weight: bold; color: #203D3F;">Name</p:outputLabel>
+				<p:inputText id="name" value="#{pilgrimBean.newPilgrim.name}"
+					required="true" placeholder="Enter Your Name"
+					style="width:200px; border:2px solid #004953; ">
+				</p:inputText>
+
+				<p:outputLabel for="gender"
+					style="font-weight: bold; color: #203D3F;">Gender</p:outputLabel>
+				<p:selectOneMenu id="gender"
+					value="#{pilgrimBean.newPilgrim.gender}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Gender" noSelectionOption="true" />
+					<f:selectItem itemLabel="Male" itemValue="Male" />
+					<f:selectItem itemLabel="Female" itemValue="Female" />
+					<f:selectItem itemLabel="Others" itemValue="Others" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="age" style="font-weight: bold; color: #203D3F;">Age</p:outputLabel>
+				<p:inputText id="age" value="#{pilgrimBean.newPilgrim.age}"
+					required="true" placeholder="Enter Place Name"
+					style="width:200px; border:2px solid #004953;">
+				</p:inputText>
+
+				<p:outputLabel for="aadhar"
+					style="font-weight: bold; color: #203D3F;">Aadhar</p:outputLabel>
+				<p:inputText id="aadhar" value="#{pilgrimBean.newPilgrim.aadhar}"
+					required="true" styleClass="block" placeholder="Enter Aadhar no."
+					style="width:200px; border:2px solid #004953; ">
+				</p:inputText>
+
+				<p:outputLabel for="phone"
+					style="font-weight: bold; color: #203D3F;">Phone</p:outputLabel>
+				<p:inputText id="phone" value="#{pilgrimBean.newPilgrim.mobile}"
+					required="true" placeholder="Enter Phone no."
+					style="width:200px; border:2px solid #004953; ">
+				</p:inputText>
+
+				<p:outputLabel for="darshan" value="Darshan"
+					style="font-weight: bold; color: #203D3F;" />
+				<p:selectOneMenu id="darshan"
+					value="#{pilgrimBean.newPilgrim.darshan}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel=" Select Type of Darshan" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.typesOfDarshan}" var="darshan"
+						itemLabel="#{darshan}" itemValue="#{darshan}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="accomodation" value="accomodation"
+					style="font-weight: bold; color: #203D3F;" />
+				<p:selectOneMenu id="accomodation"
+					value="#{pilgrimBean.selectedPlaceId}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel=" Select Accomodation" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.places}" var="place"
+						itemLabel="#{place.place_name}" itemValue="#{place.place_id}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="country" value="Country"
+					style="font-weight: bold; color: #203D3F;" />
+				<p:selectOneMenu id="country"
+					value="#{pilgrimBean.selectedCountryId}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Country" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.countries}" var="country"
+						itemLabel="#{country.country_name}"
+						itemValue="#{country.country_id}" />
+					<p:ajax event="change" listener="#{pilgrimBean.onCountryChange}"
+						update="state" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="state" value="State"
+					style="font-weight: bold; color: #203D3F;" />
+				<p:selectOneMenu id="state" value="#{pilgrimBean.selectedStateId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select State" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.states}" var="state"
+						itemLabel="#{state.state_name}" itemValue="#{state.state_id}" />
+					<p:ajax event="change" listener="#{pilgrimBean.onStateChange}"
+						update="city" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="city" value="City"
+					style="font-weight: bold; color: #203D3F;" />
+				<p:selectOneMenu id="city" value="#{pilgrimBean.selectedCityId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select City" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.cities}" var="city"
+						itemLabel="#{city.city_name}" itemValue="#{city.city_id}" />
+				</p:selectOneMenu>
+
+			</p:panelGrid>
+			<div class="dialogButtons">
+				<p:commandButton id="submit_btn" value="Submit"
+					styleClass="submit-btn" action="#{pilgrimBean.savePilgrim}"
+					update="PiligrimDataTableForm piligrim_add_frm:dialog_panel_grid"
+					process="@form" oncomplete="PF('formDialogPiligrim').hide();" />
+
+				<p:commandButton id="cancel_btn" value="Cancel"
+					styleClass="cancel-btn" onclick="PF('formDialogPiligrim').hide()" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+
+	<h:form id="piligrim_upd_frm">
+		<p:dialog id="upd_frm_dialog" widgetVar="updateFormDialogPiligrim"
+			header="Pilgrim Update Form" showEffect="fade" hideEffect="fade"
+			closeOnEscape="true" styleClass="dialogContainer" minHeight="40"
+			height="500px" width="950" resizable="true" responsive="true">
+
+			<p:panelGrid id="upd_dialog_panel_grid" layout="grid" columns="4"
+				style="width: 100%;">
+
+				<p:outputLabel for="name" style="font-weight: bold; color: #203D3F;">Name</p:outputLabel>
+				<p:inputText id="name" value="#{pilgrimBean.selectedPilgrim.name}"
+					required="true" placeholder="Enter Your Name"
+					style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="gender"
+					style="font-weight: bold; color: #203D3F;">Gender</p:outputLabel>
+				<p:selectOneMenu id="gender"
+					value="#{pilgrimBean.selectedPilgrim.gender}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Gender" noSelectionOption="true" />
+					<f:selectItem itemLabel="Male" itemValue="Male" />
+					<f:selectItem itemLabel="Female" itemValue="Female" />
+					<f:selectItem itemLabel="Others" itemValue="Others" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="age" style="font-weight: bold; color: #203D3F;">Age</p:outputLabel>
+				<p:inputText id="age" value="#{pilgrimBean.selectedPilgrim.age}"
+					required="true" placeholder="Enter Age"
+					style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="aadhar"
+					style="font-weight: bold; color: #203D3F;">Aadhar</p:outputLabel>
+				<p:inputText id="aadhar"
+					value="#{pilgrimBean.selectedPilgrim.aadhar}" required="true"
+					placeholder="Enter Aadhar no."
+					style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="phone"
+					style="font-weight: bold; color: #203D3F;">Phone</p:outputLabel>
+				<p:inputText id="phone"
+					value="#{pilgrimBean.selectedPilgrim.mobile}" required="true"
+					placeholder="Enter Phone no."
+					style="width:200px; border:2px solid #004953;" />
+
+				<p:outputLabel for="darshan"
+					style="font-weight: bold; color: #203D3F;">Darshan</p:outputLabel>
+				<p:selectOneMenu id="darshan"
+					value="#{pilgrimBean.selectedPilgrim.darshan}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Type of Darshan" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.typesOfDarshan}" var="darshan"
+						itemLabel="#{darshan}" itemValue="#{darshan}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="accomodation"
+					style="font-weight: bold; color: #203D3F;">Accomodation</p:outputLabel>
+				<p:selectOneMenu id="accomodation"
+					value="#{pilgrimBean.selectedPlaceId}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Accommodation" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.places}" var="place"
+						itemLabel="#{place.place_name}" itemValue="#{place.place_id}" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="country"
+					style="font-weight: bold; color: #203D3F;">Country</p:outputLabel>
+				<p:selectOneMenu id="country"
+					value="#{pilgrimBean.selectedCountryId}" required="true"
+					style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select Country" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.countries}" var="country"
+						itemLabel="#{country.country_name}"
+						itemValue="#{country.country_id}" />
+					<p:ajax event="change" listener="#{pilgrimBean.onCountryChange}"
+						update="state" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="state"
+					style="font-weight: bold; color: #203D3F;">State</p:outputLabel>
+				<p:selectOneMenu id="state" value="#{pilgrimBean.selectedStateId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select State" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.states}" var="state"
+						itemLabel="#{state.state_name}" itemValue="#{state.state_id}" />
+					<p:ajax event="change" listener="#{pilgrimBean.onStateChange}"
+						update="city" />
+				</p:selectOneMenu>
+
+				<p:outputLabel for="city" style="font-weight: bold; color: #203D3F;">City</p:outputLabel>
+				<p:selectOneMenu id="city" value="#{pilgrimBean.selectedCityId}"
+					required="true" style="width:200px; border:2px solid #004953;">
+					<f:selectItem itemLabel="Select City" itemValue="" />
+					<f:selectItems value="#{pilgrimBean.cities}" var="city"
+						itemLabel="#{city.city_name}" itemValue="#{city.city_id}" />
+				</p:selectOneMenu>
+
+			</p:panelGrid>
+
+			<div class="dialogButtons">
+				<p:commandButton id="submit_btn" value="Submit"
+					styleClass="submit-btn" action="#{pilgrimBean.updatePilgrim}"
+					update="PiligrimDataTableForm piligrim_upd_frm:upd_dialog_panel_grid"
+					process="@form" oncomplete="PF('updateFormDialogPiligrim').hide();" />
+
+				<p:commandButton id="cancel_btn" value="Cancel"
+					styleClass="cancel-btn"
+					onclick="PF('updateFormDialogPiligrim').hide()" />
+			</div>
+		</p:dialog>
+	</h:form>
+
+</h:body>
+</html>
